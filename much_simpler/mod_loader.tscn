@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://b3nt8fm73oky7"]
+
+[ext_resource type="Script" uid="uid://ckfjchgqqpkn2" path="res://much_simpler/mod_loader.gd" id="1_anf32"]
+
+[node name="ModLoader" type="Node"]
+script = ExtResource("1_anf32")
