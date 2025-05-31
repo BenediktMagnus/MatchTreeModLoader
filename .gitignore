@@ -2,3 +2,8 @@
 .godot/
 /android/
 .export/
+
+# Editor specific files
+.idea/
+.vscode/
+*.code-workspace
