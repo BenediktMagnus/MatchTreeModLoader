@@ -14,13 +14,9 @@ config/name="MatchTreeModLoader"
 config/features=PackedStringArray("4.4", "GL Compatibility")
 config/icon="res://icon.svg"
 
-[autoload]
-
-MatchTreeModLoader="*res://addons/MatchTreeModLoader/mod_loader_autoload.gd"
-
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/MatchTreeModLoader/plugin.cfg")
+enabled=PackedStringArray()
 
 [rendering]
 
