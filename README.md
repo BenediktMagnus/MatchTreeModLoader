@@ -31,15 +31,15 @@ It can include two kinds of files:
 - Overwriting files: Files that already exist in the game that shall be overwritten. They must have the same path inside the mod's .pck as they have in the game.
 - Additional files: Files not present in the game must be placed in a subdirectory called `mods/<mod_name>` inside the .pck file.
 
-There must be at least a single file in the .pck: `mods/<mod_name>/mod.gd`. The mod loader will load this file (after loading the .pck).
+There must be at least a single file in the .pck: `mods/<mod_name>/mod.tscn`. The mod loader will load this scene (after loading the .pck).
 
 ## Mod loading
 
-The mod's `mod.gd` is loaded after the game's base .pck but before the game's main scene has been instantiated. This means that when the `mod.gd`s `_ready` function is called, the game's autoloads are already present but not the game itself. <br>
-If the `mod.gd` file has a function `_game_ready` it will be called after the game has been fully loaded and the main scene is instantiated.
+The mod's `mod.tscn` is loaded after the game's base .pck but before the game's main scene has been instantiated. This means that when the `_ready` function of the `mod.tscn`s root node is called the game's autoloads are already present but not the game itself. <br>
+If the `mod.tscn`'s root node has a function `_game_ready` it will be called after the game has been fully loaded and the main scene is instantiated.
 
-The `mod.gd`s position in the tree is `/root/ModdingApi/<mod>`.
+The `mod.tscn`s position in the tree is `/root/ModdingApi/<mod_scene>`.
 
 ## Modding API
 
-The modding API can be accessed either from the tree node `/root/ModdingApi` or from the parent of the mod's `mod.gd` node.
+The modding API can be accessed either from the tree node `/root/ModdingApi` or from the parent of the mod's `mod.tscn`.
