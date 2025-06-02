@@ -1,6 +1,10 @@
 extends Node
 
 const MOD_LOADER_VERSION = "0.1.0"
+const SUPPORTED_GAME_VERSION = "0.5.266"
+const GAME_MAIN_SCENE_PATH = "res://UI/StartMenu/StartMenu.tscn"
+
+const MODS_PATH = "res://mods"
 
 class ModConfig:
     var name: String
@@ -26,40 +30,46 @@ class ModConfig:
         supported_mod_loader_version = _supported_mod_loader_version
 
 func _ready ():
-    print("Mod Loader starting...")
+    print("Mod Loader Version: " + MOD_LOADER_VERSION)
 
     await get_tree().process_frame
 
+    if Globals.VERSION != SUPPORTED_GAME_VERSION:
+        printerr("This mod loader is not compatible with the current game version. Expected: " + SUPPORTED_GAME_VERSION)
+        get_tree().change_scene_to_file(GAME_MAIN_SCENE_PATH)
+        return
+
     var modding_api := _load_modding_api()
-    var mod_nodes: Array[Node] = []
-    if modding_api != null:
-        mod_nodes = _load_mods()
+
+    if modding_api == null:
+        printerr("Failed to load modding API.")
+        get_tree().change_scene_to_file(GAME_MAIN_SCENE_PATH)
+        return
+
+    var mod_nodes := _load_mods()
 
     await get_tree().process_frame
 
     for mod_node: Node in mod_nodes:
         modding_api.add_child(mod_node)
 
-    get_tree().change_scene_to_file("res://UI/StartMenu/StartMenu.tscn")
+    get_tree().change_scene_to_file(GAME_MAIN_SCENE_PATH)
 
-    if modding_api != null:
-        modding_api._game_ready()
+    modding_api._game_ready()
 
     for mod_node: Node in mod_nodes:
         if mod_node.has_method("_game_ready"):
             mod_node._game_ready()
 
-    if modding_api != null:
-        print("Mod loader finished.")
+    print("Mod loader finished.")
 
 func _load_modding_api () -> Node:
     var success := ProjectSettings.load_resource_pack("res://mod_loader/modding_api.pck")
 
     if not success:
-        printerr("Failed to load modding API.")
         return null
 
-    var ModApiScene = load("res://mods/api/api.tscn")
+    var ModApiScene = load(MODS_PATH + "/api/api.tscn")
     var mod_api_scene := ModApiScene.instantiate() as Node
     get_tree().get_root().add_child(mod_api_scene)
 
@@ -95,7 +105,7 @@ func _load_mods () -> Array[Node]:
             printerr("Failed to load mod pack: " + mod_pack_file_path)
             continue
 
-        var mod_scene := load("res://mods/" + mod_file_name + "/mod.tscn")
+        var mod_scene := load(MODS_PATH + "/" + mod_file_name + "/mod.tscn")
         if mod_scene == null:
             printerr("Failed to load mod scene for: " + mod_pack_file_path)
             continue
@@ -112,7 +122,7 @@ func _load_mods () -> Array[Node]:
     return mod_nodes
 
 func _find_pack_files () -> Array[String]:
-    var mods_path = ProjectSettings.globalize_path("res://mods")
+    var mods_path = ProjectSettings.globalize_path(MODS_PATH)
 
     var mod_directory := DirAccess.open(mods_path)
 
