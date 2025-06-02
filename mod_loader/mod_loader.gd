@@ -35,8 +35,6 @@ func _ready ():
     if modding_api != null:
         mod_nodes = _load_mods()
 
-        print("Mod Loader ready.")
-
     await get_tree().process_frame
 
     for mod_node: Node in mod_nodes:
@@ -50,6 +48,9 @@ func _ready ():
     for mod_node: Node in mod_nodes:
         if mod_node.has_method("_game_ready"):
             mod_node._game_ready()
+
+    if modding_api != null:
+        print("Mod loader finished.")
 
 func _load_modding_api () -> Node:
     var success := ProjectSettings.load_resource_pack("res://mod_loader/modding_api.pck")
