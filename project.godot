@@ -13,6 +13,10 @@ config_version=5
 config/name="MatchTreeModLoader"
 config/features=PackedStringArray("4.4", "GL Compatibility")
 
+[autoload]
+
+Globals="*res://definitions/globals.gd"
+
 [editor_plugins]
 
 enabled=PackedStringArray()

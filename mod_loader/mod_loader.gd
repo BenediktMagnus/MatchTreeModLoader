@@ -1,5 +1,30 @@
 extends Node
 
+const MOD_LOADER_VERSION = "0.1.0"
+
+class ModConfig:
+    var name: String
+    var description: String
+    var author: String
+    var version: String
+    var supported_game_version: String
+    var supported_mod_loader_version: String
+
+    func _init (
+        _name: String,
+        _description: String,
+        _author: String,
+        _version: String,
+        _supported_game_version: String,
+        _supported_mod_loader_version
+    ):
+        name = _name
+        description = _description
+        author = _author
+        version = _version
+        supported_game_version = _supported_game_version
+        supported_mod_loader_version = _supported_mod_loader_version
+
 func _ready ():
     print("Mod Loader starting...")
 
@@ -45,14 +70,31 @@ func _load_mods () -> Array[Node]:
     var mod_nodes: Array[Node] = []
 
     for mod_pack_file_path: String in mod_pack_file_paths:
+        var pck_name := mod_pack_file_path.get_file()
+        var mod_file_name := pck_name.get_basename()
+
+        var mod_config := _load_mod_config_for_pck(mod_pack_file_path)
+        if mod_config == null:
+            printerr("Failed to load mod config for: " + pck_name)
+            continue
+
+        if mod_config.supported_mod_loader_version != MOD_LOADER_VERSION:
+            printerr("Mod \"" + mod_config.name + "\" is not compatible with this mod loader version (" + MOD_LOADER_VERSION + ").")
+            # TODO: It should be possible to replace a part of the version with a catchall like "*" to support a range of versions.
+            continue
+
+        if mod_config.supported_game_version != Globals.VERSION:
+            printerr("Mod \"" + mod_config.name + "\" is not compatible with this game version (" + Globals.VERSION + ").")
+            # TODO: It should be possible to replace a part of the version with a catchall like "*" to support a range of versions.
+            continue
+
         var success := ProjectSettings.load_resource_pack(mod_pack_file_path)
 
         if not success:
             printerr("Failed to load mod pack: " + mod_pack_file_path)
             continue
 
-        var mod_name = mod_pack_file_path.get_file().get_basename()
-        var mod_scene := load("res://mods/" + mod_name + "/mod.tscn")
+        var mod_scene := load("res://mods/" + mod_file_name + "/mod.tscn")
         if mod_scene == null:
             printerr("Failed to load mod scene for: " + mod_pack_file_path)
             continue
@@ -61,6 +103,8 @@ func _load_mods () -> Array[Node]:
         if mod_node == null:
             printerr("Failed to instantiate mod node for: " + mod_pack_file_path)
             continue
+
+        print("Loaded mod: \"" + mod_config.name + "\" (" + mod_config.version + ")")
 
         mod_nodes.append(mod_node)
 
@@ -88,7 +132,6 @@ func _find_pack_files () -> Array[String]:
 
     return mod_pack_file_paths
 
-
 func _get_pcks_in_folder (path: String) -> Array[String]:
     var directory := DirAccess.open(path)
     if directory == null:
@@ -107,3 +150,32 @@ func _get_pcks_in_folder (path: String) -> Array[String]:
             packs.append(current_directory + "/" + file)
 
     return packs
+
+func _load_mod_config_for_pck (pck_path: String) -> ModConfig:
+    var config_path := pck_path.get_basename() + ".mod"
+
+    if not FileAccess.file_exists(config_path):
+        return null
+
+    var config_file := FileAccess.get_file_as_string(config_path)
+
+    var config_json = JSON.parse_string(config_file) as Dictionary
+
+    if !config_json.has("name") or \
+        !config_json.has("description") or \
+        !config_json.has("author") or \
+        !config_json.has("version") or \
+        !config_json.has("supported_game_version") or \
+        !config_json.has("supported_mod_loader_version"):
+        return null
+
+    var mod_config = ModConfig.new(
+        config_json["name"],
+        config_json["description"],
+        config_json["author"],
+        config_json["version"],
+        config_json["supported_game_version"],
+        config_json["supported_mod_loader_version"]
+    )
+
+    return mod_config
