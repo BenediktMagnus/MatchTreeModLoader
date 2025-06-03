@@ -69,7 +69,7 @@ func _load_modding_api () -> Node:
     if not success:
         return null
 
-    var ModApiScene = load(MODS_PATH + "/api/api.tscn")
+    var ModApiScene = load(MODS_PATH + "/modding_api/modding_api.tscn")
     var mod_api_scene := ModApiScene.instantiate() as Node
     get_tree().get_root().add_child(mod_api_scene)
 

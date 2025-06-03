@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://7x28v22r77be"]
+
+[ext_resource type="Script" uid="uid://cxclf41045nsv" path="res://mods/modding_api/modding_api.gd" id="1_0h8vp"]
+
+[node name="ModdingApi" type="Node"]
+script = ExtResource("1_0h8vp")
