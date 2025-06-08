@@ -42,3 +42,11 @@ func _on_node_added_to_scene_tree (node: Node):
             start_menu_loaded.emit(node)
         ^"/root/Worldmap":
             world_map_loaded.emit(node)
+        _:
+            var script: Script = node.get_script()
+            while script != null:
+                if script.get_global_name() == "basemap":
+                    level_loaded.emit(node)
+                    break
+                else:
+                    script = script.get_base_script()
