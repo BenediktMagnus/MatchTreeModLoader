@@ -1,7 +1,7 @@
 extends Node
 
-const MOD_LOADER_VERSION = "0.1.4"
-const SUPPORTED_GAME_VERSION = "0.5.285"
+const MOD_LOADER_VERSION = "0.1.5"
+const SUPPORTED_GAME_VERSION = "0.5.299"
 const GAME_MAIN_SCENE_PATH = "res://UI/StartMenu/StartMenu.tscn"
 
 const MODS_PATH = "res://mods"
